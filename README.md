@@ -1,10 +1,12 @@
 <p align="center"><img src="./readme_images/banner.png" width=500 /></p>
 
-**ArXiv Digest and Personalized Recommendations using Large Language Models.**
+**ArXiv Digest (extra version) and Personalized Recommendations using Large Language Models.**
+
+*(Note: This is an adjusted repo to match my needs. For original repo please refer to **AutoLLM** that I forked from)*
 
 This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and natural-language descriptions, using relevancy ratings from GPT.
 
-You can try it out on [Hugging Face](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI API key.
+You can try it out on [Hugging Face](https://huggingface.co/spaces/linhkid91/ArxivDigest-extra) using your own OpenAI API key.
 
 You can also create a daily subscription pipeline to email you the results.
 
@@ -33,7 +35,7 @@ This repository offers a method to curate a daily digest, sorted by relevance, u
 
 ### Testing it out with Hugging Face:
 
-We provide a demo at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
+We provide a demo at [https://huggingface.co/spaces/linhkid91/ArxivDigest-extra](https://huggingface.co/spaces/AutoLLM/ArxivDigest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
 
 ![hfexample](./readme_images/hf_example.png)
 
@@ -43,22 +45,16 @@ You can also send yourself an email of the digest by creating a SendGrid account
 
 #### Digest Configuration:
 - Subject/Topic: Computer Science
-- Categories: Artificial Intelligence, Computation and Language 
+- Categories: Artificial Intelligence, Computation and Language, Machine Learning
 - Interest: 
-  - Large language model pretraining and finetunings
-  - Multimodal machine learning
-  - Do not care about specific application, for example, information extraction, summarization, etc.
-  - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
+  1. Large language model pretraining and finetunings
+  2. Multimodal machine learning
+  3. RAGs, Information retrieval
+  4. Optimization of LLM and GenAI
+  5. Do not care about specific application, for example, information extraction, summarization, etc.
 
 #### Result:
-<p align="left"><img src="./readme_images/example_1.png" width=580 /></p>
-
-#### Digest Configuration:
-- Subject/Topic: Quantitative Finance
-- Interest: "making lots of money"
-
-#### Result:
-<p align="left"><img src="./readme_images/example_2.png" width=580 /></p>
+<p align="left"><img src="./readme_images/example_custom_1.png" width=580 /></p>
 
 ## 💡 Usage
 
@@ -94,6 +90,7 @@ To locally run the same UI as the Huggign Face space:
 
 - [x] Support personalized paper recommendation using LLM.
 - [x] Send emails for daily digest.
+- [x] Further read from the paper itself via its HTML format (.pdf version will be implemented in the next phase)
 - [ ] Implement a ranking factor to prioritize content from specific authors.
 - [ ] Support open-source models, e.g., LLaMA, Vicuna, MPT etc.
 - [ ] Fine-tune an open-source model to better support paper ranking and stay updated with the latest research concepts..

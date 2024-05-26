@@ -24,7 +24,8 @@ if openai_org is not None:
 
 @dataclasses.dataclass
 class OpenAIDecodingArguments(object):
-    max_tokens: int = 1800
+    #max_tokens: int = 1800
+    max_tokens: int = 5400
     temperature: float = 0.2
     top_p: float = 1.0
     n: int = 1
@@ -39,7 +40,7 @@ def openai_completion(
     prompts, #: Union[str, Sequence[str], Sequence[dict[str, str]], dict[str, str]],
     decoding_args: OpenAIDecodingArguments,
     model_name="text-davinci-003",
-    sleep_time=2,
+    sleep_time=15,
     batch_size=1,
     max_instances=sys.maxsize,
     max_batches=sys.maxsize,
@@ -96,10 +97,11 @@ def openai_completion(
     ):
         batch_decoding_args = copy.deepcopy(decoding_args)  # cloning the decoding_args
 
-        backoff = 3
+        backoff = 5
 
         while True:
             try:
+                time.sleep(3)
                 shared_kwargs = dict(
                     model=model_name,
                     **batch_decoding_args.__dict__,
@@ -134,6 +136,7 @@ def openai_completion(
                     backoff -= 1
                     logging.warning("Hit request rate limit; retrying...")
                     time.sleep(sleep_time)  # Annoying rate limit on requests.
+                    continue
 
     if return_text:
         completions = [completion.text for completion in completions]

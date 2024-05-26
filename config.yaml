@@ -3,7 +3,7 @@ topic: "Computer Science"
 # An empty list here will include all categories in a topic
 # Use the natural language names of the topics, found here: https://arxiv.org
 # Including more categories will result in more calls to the large language model
-categories: ["Artificial Intelligence", "Computation and Language"]
+categories: ["Artificial Intelligence", "Computation and Language", "Machine Learning", "Information Retrieval"]
 
 # Relevance score threshold. abstracts that receive a score less than this from the large language model
 # will have their papers filtered out.
@@ -23,5 +23,6 @@ threshold: 7
 interest: |
   1. Large language model pretraining and finetunings
   2. Multimodal machine learning
-  3. Do not care about specific application, for example, information extraction, summarization, etc.
-  4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
+  3. RAGs, Information retrieval
+  4. Optimization of LLM and GenAI
+  5. Do not care about specific application, for example, information extraction, summarization, etc.

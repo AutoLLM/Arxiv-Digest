@@ -23,31 +23,60 @@ def encode_prompt(query, prompt_papers):
     prompt += query['interest']
 
     for idx, task_dict in enumerate(prompt_papers):
-        (title, authors, abstract) = task_dict["title"], task_dict["authors"], task_dict["abstract"]
+        (title, authors, abstract, content) = task_dict["title"], task_dict["authors"], task_dict["abstract"], task_dict["content"]
         if not title:
             raise
         prompt += f"###\n"
         prompt += f"{idx + 1}. Title: {title}\n"
         prompt += f"{idx + 1}. Authors: {authors}\n"
         prompt += f"{idx + 1}. Abstract: {abstract}\n"
+        prompt += f"{idx + 1}. Content: {content}\n"
     prompt += f"\n Generate response:\n1."
-    print(prompt)
     return prompt
 
 
-def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
+def is_json(myjson):
+    try:
+        json.loads(myjson)
+    except Exception as e:
+        return False
+    return True
+
+def post_process_chat_gpt_response(paper_data, response, threshold_score=7):
     selected_data = []
     if response is None:
         return []
     json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
     pattern = r"^\d+\. |\\"
     import pprint
+
+    def try_loads(line):
+        try:
+            return json.loads(re.sub(pattern, "", line))
+        except json.JSONDecodeError:
+            return None
+    score_items = []
     try:
-        score_items = [
-            json.loads(re.sub(pattern, "", line))
-            for line in json_items if "relevancy score" in line.lower()]
-    except Exception:
+        # score_items = [
+        #     json.loads(re.sub(pattern, "", line))
+        #     for line in json_items if (is_json(line) and "relevancy score" in line.lower())]
+        for line in json_items:
+            if is_json(line) and "relevancy score" in line.lower():
+                score_items.append(json.loads(re.sub(pattern, "", line)))
+            #elif
+
+        # score_items = [
+        #     loaded_json
+        #     for line in json_items if (is_json(line) and "relevancy score" in line.lower())
+        #     for loaded_json in [try_loads(line)] if loaded_json is not None
+        # ]
+    except Exception as e:
         pprint.pprint([re.sub(pattern, "", line) for line in json_items if "relevancy score" in line.lower()])
+        try:
+            score_items = score_items[:-1]
+        except Exception:
+            score_items = []
+        print(e)
         raise RuntimeError("failed")
     pprint.pprint(score_items)
     scores = []
@@ -67,7 +96,8 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
         # if the decoding stops due to length, the last example is likely truncated so we discard it
         if scores[idx] < threshold_score:
             continue
-        output_str = "Title: " + paper_data[idx]["title"] + "\n"
+        output_str = "Subject: " + paper_data[idx]["subjects"] + "\n"
+        output_str += "Title: " + paper_data[idx]["title"] + "\n"
         output_str += "Authors: " + paper_data[idx]["authors"] + "\n"
         output_str += "Link: " + paper_data[idx]["main_page"] + "\n"
         for key, value in inst.items():
@@ -91,8 +121,8 @@ def generate_relevance_score(
     all_papers,
     query,
     model_name="gpt-3.5-turbo-16k",
-    threshold_score=8,
-    num_paper_in_prompt=4,
+    threshold_score=7,
+    num_paper_in_prompt=1,
     temperature=0.4,
     top_p=1.0,
     sorting=True
@@ -104,11 +134,10 @@ def generate_relevance_score(
         prompt_papers = all_papers[id:id+num_paper_in_prompt]
         # only sampling from the seed tasks
         prompt = encode_prompt(query, prompt_papers)
-
         decoding_args = utils.OpenAIDecodingArguments(
             temperature=temperature,
             n=1,
-            max_tokens=128*num_paper_in_prompt, # The response for each paper should be less than 128 tokens. 
+            max_tokens=1024*num_paper_in_prompt, # The response for each paper should be less than 128 tokens.
             top_p=top_p,
         )
         request_start = time.time()
@@ -136,12 +165,12 @@ def generate_relevance_score(
     return ans_data, hallucination
 
 def run_all_day_paper(
-    query={"interest":"", "subjects":["Computation and Language", "Artificial Intelligence"]},
+    query={"interest":"Computer Science", "subjects":["Machine Learning", "Computation and Language", "Artificial Intelligence", "Information Retrieval"]},
     date=None,
     data_dir="../data",
     model_name="gpt-3.5-turbo-16k",
-    threshold_score=8,
-    num_paper_in_prompt=8,
+    threshold_score=7,
+    num_paper_in_prompt=2,
     temperature=0.4,
     top_p=1.0
 ):
